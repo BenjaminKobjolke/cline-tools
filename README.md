@@ -22,12 +22,57 @@ These rule files enhance Cline's capabilities by providing comprehensive languag
 
 When used with the Cline VS Code plugin, these rules help AI assistants better understand your codebase and provide more accurate, contextually relevant assistance for different programming languages and frameworks.
 
+## Directory Structure
+
+The repository uses the following structure for organizing rule files:
+
+```
+clinerules/
+  ├── system/      - System-specific rule files
+  ├── project/     - Project-specific rule files
+  └── languages/   - Language-specific rule files
+
+output/
+  └── clinerules   - Generated rules file (without dot prefix)
+```
+
+## Available Tools
+
+The repository includes several Python tools for managing clinerules files:
+
+1. **Create Rules** (`create_rules.py`):
+
+   - Combines selected system, project, and language rules into a single rules file
+   - Interactive selection of components to include
+   - Creates output/clinerules file (without dot prefix)
+
+2. **Compare Rules** (`compare_rules.py`):
+
+   - Compares blocks between local and external clinerules files
+   - Supports both git diff and VS Code diff views
+
+3. **Update Local Rules** (`update_local_cline_rules_with_external_file.py`):
+
+   - Updates a selected local rule file with content from an external .clinerules file
+   - Extracts matching block based on file type and name
+
+4. **Update External Rules** (`update_external_cline_rules_with_local_file.py`):
+   - Updates a block in an external .clinerules file with content from a local rule file
+   - Preserves other blocks in the external file
+
 ## Usage
 
 1. Clone this repository
-2. Copy the desired rule file to your project directory
-3. Rename the rule file to `.clinerules` (e.g., rename `.clinerules_python` to `.clinerules` in your Python project)
-4. The Cline VS Code plugin will automatically detect and use these rules when providing assistance for your project
+2. Run `install.bat` to set up the Python environment and dependencies
+3. Run `run.bat` to access the tools menu
+4. Select the desired operation:
+   - Create a new rules file (outputs to output/clinerules)
+   - Compare local and external rules
+   - Update local rules from external file
+   - Update external file from local rules
+5. For use with Cline VS Code plugin:
+   - Copy output/clinerules to your project
+   - Rename to .clinerules
 
 ## Contributing
 

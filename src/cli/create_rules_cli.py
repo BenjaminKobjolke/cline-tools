@@ -15,6 +15,7 @@ class CreateRulesCLI:
         self.file_manager = FileManager()
         self.input_handler = InputHandler()
         self.clinerules_dir = os.path.join(os.getcwd(), 'clinerules')
+        self.output_dir = os.path.join(os.getcwd(), 'output')
 
     def select_system_file(self) -> Optional[str]:
         """
@@ -89,7 +90,7 @@ class CreateRulesCLI:
 
     def create_rules_file(self) -> bool:
         """
-        Create a new .clinerules file from selected components.
+        Create a new clinerules file from selected components.
         
         Returns:
             True if file was created successfully, False otherwise
@@ -104,6 +105,10 @@ class CreateRulesCLI:
                 print("  ├── project/")
                 print("  └── languages/")
                 return False
+
+            # Create output directory if it doesn't exist
+            if not os.path.exists(self.output_dir):
+                os.makedirs(self.output_dir)
 
             # Select system file
             system_file = self.select_system_file()
@@ -125,11 +130,12 @@ class CreateRulesCLI:
             if merged_content is None:
                 return False
 
-            # Write merged content
-            if not self.file_manager.write_file('.clinerules', merged_content):
+            # Write merged content to output/clinerules
+            output_file = os.path.join(self.output_dir, 'clinerules')
+            if not self.file_manager.write_file(output_file, merged_content):
                 return False
 
-            print("\nFiles merged successfully into .clinerules")
+            print("\nFiles merged successfully into output/clinerules")
             print("Merged files:")
             for file in all_files:
                 print(f"- {os.path.basename(file)}")

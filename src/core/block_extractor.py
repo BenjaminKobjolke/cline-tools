@@ -1,6 +1,6 @@
 import os
 import re
-from typing import Optional
+from typing import Optional, Tuple
 from src.utils.logging_config import setup_logger
 
 logger = setup_logger(__name__)
@@ -94,6 +94,61 @@ class BlockExtractor:
             block_content = block_content[:len(start_pattern) + next_begin.start()].strip()
         
         return block_content.strip()
+
+    @classmethod
+    def find_block_bounds(cls, content: str, block_type: str, filename: str) -> Optional[Tuple[int, int]]:
+        """
+        Find the start and end positions of a block in content.
+        
+        Args:
+            content: Content to search in
+            block_type: Type of block to find
+            filename: Name of file being processed
+            
+        Returns:
+            Tuple of (start_pos, end_pos) or None if block not found
+        """
+        start_pattern = cls.get_start_pattern(block_type, filename)
+        if not start_pattern:
+            return None
+
+        # Find the start of the block
+        start_match = content.find(start_pattern)
+        if start_match == -1:
+            return None
+
+        # Get content from start pattern
+        remaining = content[start_match:]
+        
+        # Find next BEGIN marker if it exists
+        next_begin = re.search(r'### BEGIN', remaining[len(start_pattern):])
+        if next_begin:
+            end_pos = start_match + len(start_pattern) + next_begin.start()
+        else:
+            end_pos = len(content)
+
+        return (start_match, end_pos)
+
+    @classmethod
+    def replace_block(cls, content: str, new_block: str, block_type: str, filename: str) -> Optional[str]:
+        """
+        Replace a block in content with new block content.
+        
+        Args:
+            content: Original content
+            new_block: New block content to insert
+            block_type: Type of block to replace
+            filename: Name of file being processed
+            
+        Returns:
+            Updated content with block replaced or None if block not found
+        """
+        bounds = cls.find_block_bounds(content, block_type, filename)
+        if not bounds:
+            return None
+
+        start_pos, end_pos = bounds
+        return content[:start_pos] + new_block + content[end_pos:]
 
     @classmethod
     def compare_blocks(cls, external_content: str, local_content: str, 
