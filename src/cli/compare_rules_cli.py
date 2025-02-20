@@ -18,6 +18,7 @@ class CompareRulesCLI:
         self.block_extractor = BlockExtractor()
         self.diff_handler = DiffHandler()
         self.input_handler = InputHandler()
+        self.clinerules_dir = os.path.join(os.getcwd(), 'clinerules')
 
     def get_files_by_category(self) -> tuple[List[str], List[str], List[str]]:
         """
@@ -26,15 +27,14 @@ class CompareRulesCLI:
         Returns:
             Tuple of (system_files, project_files, language_files)
         """
-        current_dir = os.getcwd()
         system_files = self.file_manager.list_files(
-            os.path.join(current_dir, 'system', 'clinerules_*')
+            os.path.join(self.clinerules_dir, 'system', 'clinerules_*')
         )
         project_files = self.file_manager.list_files(
-            os.path.join(current_dir, 'project', 'clinerules_*')
+            os.path.join(self.clinerules_dir, 'project', 'clinerules_*')
         )
         language_files = self.file_manager.list_files(
-            os.path.join(current_dir, 'languages', 'clinerules_*')
+            os.path.join(self.clinerules_dir, 'languages', 'clinerules_*')
         )
         return system_files, project_files, language_files
 
@@ -77,9 +77,13 @@ class CompareRulesCLI:
             all_files.extend(language_files)
 
         if not all_files:
-            logger.error("\nNo files found to compare")
-            logger.error("Make sure you're running the script from the correct directory")
-            logger.error(f"Current directory: {os.getcwd()}")
+            print("\nNo files found to compare")
+            print("Make sure the clinerules directory exists with the following structure:")
+            print("clinerules/")
+            print("  ├── system/")
+            print("  ├── project/")
+            print("  └── languages/")
+            print(f"\nCurrent directory: {os.getcwd()}")
             return None
 
         return self.input_handler.get_valid_selection(all_files, "\nSelect file number to compare: ")
@@ -97,7 +101,12 @@ class CompareRulesCLI:
         try:
             # Check if external file exists
             if not os.path.exists(external_file):
-                logger.error(f"Error: File not found: {external_file}")
+                print(f"Error: File not found: {external_file}")
+                return False
+
+            # Check if clinerules directory exists
+            if not os.path.exists(self.clinerules_dir):
+                print(f"Error: Clinerules directory not found: {self.clinerules_dir}")
                 return False
 
             # Get and display files by category
@@ -117,7 +126,7 @@ class CompareRulesCLI:
             # Determine block type
             block_type = self.block_extractor.determine_block_type(local_file)
             if not block_type:
-                logger.error(f"Could not determine block type from path: {local_file}")
+                print(f"Could not determine block type from path: {local_file}")
                 return False
 
             # Extract blocks
@@ -129,7 +138,7 @@ class CompareRulesCLI:
             )
 
             if external_block is None or local_block is None:
-                logger.error("Could not extract blocks for comparison")
+                print("Could not extract blocks for comparison")
                 return False
 
             # Check if blocks are identical
@@ -155,7 +164,7 @@ def main() -> None:
 
     cli = CompareRulesCLI()
     if not cli.compare_rules_files(args.external_file):
-        logger.error("Failed to compare rules files")
+        print("Failed to compare rules files")
 
 if __name__ == '__main__':
     main()

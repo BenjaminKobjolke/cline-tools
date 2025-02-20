@@ -14,6 +14,7 @@ class CreateRulesCLI:
         """Initialize CreateRulesCLI with required components."""
         self.file_manager = FileManager()
         self.input_handler = InputHandler()
+        self.clinerules_dir = os.path.join(os.getcwd(), 'clinerules')
 
     def select_system_file(self) -> Optional[str]:
         """
@@ -22,9 +23,12 @@ class CreateRulesCLI:
         Returns:
             Selected system file path or None if no selection made
         """
-        system_files = self.file_manager.list_files(os.path.join('system', 'clinerules*.md'))
+        system_files = self.file_manager.list_files(
+            os.path.join(self.clinerules_dir, 'system', 'clinerules*.md')
+        )
         if not system_files:
             print("No system files found")
+            print("Expected location:", os.path.join(self.clinerules_dir, 'system'))
             return None
 
         self.input_handler.display_files_with_numbers(system_files, "System")
@@ -37,9 +41,12 @@ class CreateRulesCLI:
         Returns:
             Selected project file path or None if no selection made
         """
-        project_files = self.file_manager.list_files(os.path.join('project', 'clinerules*.md'))
+        project_files = self.file_manager.list_files(
+            os.path.join(self.clinerules_dir, 'project', 'clinerules*.md')
+        )
         if not project_files:
             print("No project files found")
+            print("Expected location:", os.path.join(self.clinerules_dir, 'project'))
             return None
 
         self.input_handler.display_files_with_numbers(project_files, "Project")
@@ -52,9 +59,12 @@ class CreateRulesCLI:
         Returns:
             List of selected language file paths
         """
-        language_files = self.file_manager.list_files(os.path.join('languages', 'clinerules*.md'))
+        language_files = self.file_manager.list_files(
+            os.path.join(self.clinerules_dir, 'languages', 'clinerules*.md')
+        )
         if not language_files:
             print("No language files found")
+            print("Expected location:", os.path.join(self.clinerules_dir, 'languages'))
             return []
 
         selected: List[str] = []
@@ -85,6 +95,16 @@ class CreateRulesCLI:
             True if file was created successfully, False otherwise
         """
         try:
+            # Check if clinerules directory exists
+            if not os.path.exists(self.clinerules_dir):
+                print(f"Error: Clinerules directory not found: {self.clinerules_dir}")
+                print("\nExpected directory structure:")
+                print("clinerules/")
+                print("  ├── system/")
+                print("  ├── project/")
+                print("  └── languages/")
+                return False
+
             # Select system file
             system_file = self.select_system_file()
             if not system_file:
@@ -124,7 +144,7 @@ def main() -> None:
     """Main entry point for create_rules CLI."""
     cli = CreateRulesCLI()
     if not cli.create_rules_file():
-        logger.error("Failed to create rules file")
+        print("Failed to create rules file")
 
 if __name__ == '__main__':
     main()

@@ -1,3 +1,4 @@
+import os
 import re
 from typing import Optional
 from src.utils.logging_config import setup_logger
@@ -24,13 +25,17 @@ class BlockExtractor:
         Returns:
             Block type (LANGUAGE, SYSTEM, or PROJECT) or None if unknown
         """
-        path_lower = file_path.lower()
-        if 'languages' in path_lower:
-            return 'LANGUAGE'
-        elif 'system' in path_lower:
-            return 'SYSTEM'
-        elif 'project' in path_lower:
-            return 'PROJECT'
+        path_parts = file_path.lower().split(os.sep)
+        if 'clinerules' in path_parts:
+            clinerules_index = path_parts.index('clinerules')
+            if len(path_parts) > clinerules_index + 1:
+                category = path_parts[clinerules_index + 1]
+                if category == 'languages':
+                    return 'LANGUAGE'
+                elif category == 'system':
+                    return 'SYSTEM'
+                elif category == 'project':
+                    return 'PROJECT'
         return None
 
     @classmethod
