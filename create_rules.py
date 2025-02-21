@@ -6,5 +6,5 @@ This script provides a command-line interface for selecting and merging rule fil
 
 from src.cli.create_rules_cli import main
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

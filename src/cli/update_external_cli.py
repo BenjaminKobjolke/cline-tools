@@ -8,6 +8,7 @@ from src.utils.input_handler import InputHandler
 
 logger = setup_logger(__name__)
 
+
 class UpdateExternalCLI:
     """CLI interface for updating external clinerules files with local content."""
 
@@ -16,31 +17,31 @@ class UpdateExternalCLI:
         self.file_manager = FileManager()
         self.block_extractor = BlockExtractor()
         self.input_handler = InputHandler()
-        self.clinerules_dir = os.path.join(os.getcwd(), 'clinerules')
+        self.clinerules_dir = os.path.join(os.getcwd(), "clinerules")
 
     def get_local_files(self) -> List[str]:
         """
         Get all local clinerules files.
-        
+
         Returns:
             List of file paths
         """
         all_files = []
-        
+
         # Get files from each directory
         system_files = self.file_manager.list_files(
-            os.path.join(self.clinerules_dir, 'system', 'clinerules_*')
+            os.path.join(self.clinerules_dir, "system", "clinerules_*")
         )
         project_files = self.file_manager.list_files(
-            os.path.join(self.clinerules_dir, 'project', 'clinerules_*')
+            os.path.join(self.clinerules_dir, "project", "clinerules_*")
         )
         language_files = self.file_manager.list_files(
-            os.path.join(self.clinerules_dir, 'languages', 'clinerules_*')
+            os.path.join(self.clinerules_dir, "languages", "clinerules_*")
         )
 
         # Display files with continuous numbering
         current_number = 1
-        
+
         if system_files:
             current_number = self.input_handler.display_files_with_numbers(
                 system_files, "System", current_number
@@ -64,10 +65,10 @@ class UpdateExternalCLI:
     def update_external_file(self, external_file: str) -> bool:
         """
         Update external file with content from local file.
-        
+
         Args:
             external_file: Path to external clinerules file
-            
+
         Returns:
             True if update was successful, False otherwise
         """
@@ -95,8 +96,7 @@ class UpdateExternalCLI:
 
             # Get user selection
             local_file = self.input_handler.get_valid_selection(
-                local_files,
-                "\nSelect file to use: "
+                local_files, "\nSelect file to use: "
             )
             if not local_file:
                 return False
@@ -135,17 +135,19 @@ class UpdateExternalCLI:
             logger.error(f"An unexpected error occurred: {e}")
             return False
 
+
 def main() -> None:
     """Main entry point for update_external CLI."""
     parser = argparse.ArgumentParser(
-        description='Update external clinerules file with content from local file'
+        description="Update external clinerules file with content from local file"
     )
-    parser.add_argument('external_file', help='Path to external clinerules file')
+    parser.add_argument("external_file", help="Path to external clinerules file")
     args = parser.parse_args()
 
     cli = UpdateExternalCLI()
     if not cli.update_external_file(args.external_file):
         print("Failed to update external file")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

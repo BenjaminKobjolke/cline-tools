@@ -9,6 +9,7 @@ from src.utils.input_handler import InputHandler
 
 logger = setup_logger(__name__)
 
+
 class CompareRulesCLI:
     """CLI interface for comparing clinerules files."""
 
@@ -18,37 +19,40 @@ class CompareRulesCLI:
         self.block_extractor = BlockExtractor()
         self.diff_handler = DiffHandler()
         self.input_handler = InputHandler()
-        self.clinerules_dir = os.path.join(os.getcwd(), 'clinerules')
+        self.clinerules_dir = os.path.join(os.getcwd(), "clinerules")
 
     def get_files_by_category(self) -> tuple[List[str], List[str], List[str]]:
         """
         Get files organized by category.
-        
+
         Returns:
             Tuple of (system_files, project_files, language_files)
         """
         system_files = self.file_manager.list_files(
-            os.path.join(self.clinerules_dir, 'system', 'clinerules_*')
+            os.path.join(self.clinerules_dir, "system", "clinerules_*")
         )
         project_files = self.file_manager.list_files(
-            os.path.join(self.clinerules_dir, 'project', 'clinerules_*')
+            os.path.join(self.clinerules_dir, "project", "clinerules_*")
         )
         language_files = self.file_manager.list_files(
-            os.path.join(self.clinerules_dir, 'languages', 'clinerules_*')
+            os.path.join(self.clinerules_dir, "languages", "clinerules_*")
         )
         return system_files, project_files, language_files
 
-    def display_and_select_file(self, system_files: List[str], 
-                              project_files: List[str], 
-                              language_files: List[str]) -> Optional[str]:
+    def display_and_select_file(
+        self,
+        system_files: List[str],
+        project_files: List[str],
+        language_files: List[str],
+    ) -> Optional[str]:
         """
         Display files and get user selection.
-        
+
         Args:
             system_files: List of system rule files
             project_files: List of project rule files
             language_files: List of language rule files
-            
+
         Returns:
             Selected file path or None if no selection made
         """
@@ -78,7 +82,9 @@ class CompareRulesCLI:
 
         if not all_files:
             print("\nNo files found to compare")
-            print("Make sure the clinerules directory exists with the following structure:")
+            print(
+                "Make sure the clinerules directory exists with the following structure:"
+            )
             print("clinerules/")
             print("  ├── system/")
             print("  ├── project/")
@@ -86,15 +92,17 @@ class CompareRulesCLI:
             print(f"\nCurrent directory: {os.getcwd()}")
             return None
 
-        return self.input_handler.get_valid_selection(all_files, "\nSelect file number to compare: ")
+        return self.input_handler.get_valid_selection(
+            all_files, "\nSelect file number to compare: "
+        )
 
     def compare_rules_files(self, external_file: str) -> bool:
         """
         Compare rules files and show differences.
-        
+
         Args:
             external_file: Path to external rules file to compare against
-            
+
         Returns:
             True if comparison was successful, False otherwise
         """
@@ -111,15 +119,17 @@ class CompareRulesCLI:
 
             # Get and display files by category
             system_files, project_files, language_files = self.get_files_by_category()
-            local_file = self.display_and_select_file(system_files, project_files, language_files)
-            
+            local_file = self.display_and_select_file(
+                system_files, project_files, language_files
+            )
+
             if not local_file:
                 return False
 
             # Read file contents
             external_content = self.file_manager.read_file(external_file)
             local_content = self.file_manager.read_file(local_file)
-            
+
             if external_content is None or local_content is None:
                 return False
 
@@ -156,15 +166,19 @@ class CompareRulesCLI:
             logger.error(f"An unexpected error occurred: {e}")
             return False
 
+
 def main() -> None:
     """Main entry point for compare_rules CLI."""
-    parser = argparse.ArgumentParser(description='Compare clinerules blocks between files')
-    parser.add_argument('external_file', help='Path to external clinerules file')
+    parser = argparse.ArgumentParser(
+        description="Compare clinerules blocks between files"
+    )
+    parser.add_argument("external_file", help="Path to external clinerules file")
     args = parser.parse_args()
 
     cli = CompareRulesCLI()
     if not cli.compare_rules_files(args.external_file):
         print("Failed to compare rules files")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

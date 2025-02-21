@@ -6,5 +6,5 @@ This script provides a command-line interface for comparing rule files and displ
 
 from src.cli.compare_rules_cli import main
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

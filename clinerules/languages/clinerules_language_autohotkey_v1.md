@@ -43,3 +43,61 @@
 - Always store concatenated strings in variables before using in commands
 - Use bracket notation for all object property access
 - Remember to use %% for variables in command parameters
+
+# GUI Commands
+
+- When using named GUIs, be consistent with the name prefix
+- CORRECT:
+  ```autohotkey
+  Gui, main:Add, Text, h100 w100, Text
+  Gui, main:Show, w200 h100
+  ```
+- WRONG (inconsistent naming):
+  ```autohotkey
+  Gui, main:Add, Text, h100 w100, Text
+  Gui, Show, w200 h100  ; missing main: prefix
+  ```
+- For temporary GUIs (like alerts), use no prefix consistently
+- Options like h100, w200 should not have spaces between letter and number
+
+# Function Definitions
+
+- Opening brace goes on a new line
+- CORRECT:
+  ```autohotkey
+  MyFunction()
+  {
+      code here
+  }
+  ```
+- WRONG:
+  ```autohotkey
+  MyFunction() {
+      code here
+  }
+  ```
+
+# Include Files
+
+- Include order matters - files with dependencies must be included after their dependencies
+- Global variables should be included first
+- Function definitions should be included before they're used
+- Hotkey definitions should be included last
+- CORRECT order:
+  ```autohotkey
+  #Include global.ahk
+  #Include functions.ahk
+  #Include gui.ahk
+  #Include hotkeys.ahk
+  ```
+
+# Code Organization
+
+- Split large files into logical modules
+- Keep related functionality together
+- Use descriptive file names that indicate purpose
+- Common splits:
+  - global.ahk: Global variables
+  - gui.ahk: GUI related functions
+  - hotkeys.ahk: Hotkey definitions
+  - config.ahk: Configuration handling
