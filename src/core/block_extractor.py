@@ -13,6 +13,7 @@ class BlockExtractor:
         "LANGUAGE": r"clinerules_language_(\w+)\.md",
         "SYSTEM": "SYSTEM",
         "PROJECT": "PROJECT",
+        "GENERAL": "GENERAL",
     }
 
     @staticmethod
@@ -24,14 +25,16 @@ class BlockExtractor:
             file_path: Path to the file
 
         Returns:
-            Block type (LANGUAGE, SYSTEM, or PROJECT) or None if unknown
+            Block type (GENERAL, LANGUAGE, SYSTEM, or PROJECT) or None if unknown
         """
         path_parts = file_path.lower().split(os.sep)
         if "clinerules" in path_parts:
             clinerules_index = path_parts.index("clinerules")
             if len(path_parts) > clinerules_index + 1:
                 category = path_parts[clinerules_index + 1]
-                if category == "languages":
+                if category == "general":
+                    return "GENERAL"
+                elif category == "languages":
                     return "LANGUAGE"
                 elif category == "system":
                     return "SYSTEM"
@@ -45,7 +48,7 @@ class BlockExtractor:
         Get the start pattern for a block type.
 
         Args:
-            block_type: Type of block (LANGUAGE, SYSTEM, or PROJECT)
+            block_type: Type of block (GENERAL, LANGUAGE, SYSTEM, or PROJECT)
             filename: Name of file being processed
 
         Returns:
@@ -58,6 +61,8 @@ class BlockExtractor:
                 return f"### BEGIN LANGUAGE {language}"
             return None
         elif block_type in cls.BLOCK_TYPES:
+            if block_type == "GENERAL":
+                return "### BEGIN GENERAL RULES"
             return f"### BEGIN {block_type}"
         return None
 
@@ -70,7 +75,7 @@ class BlockExtractor:
 
         Args:
             content: File content to extract from
-            block_type: Type of block to extract (LANGUAGE, SYSTEM, or PROJECT)
+            block_type: Type of block to extract (GENERAL, LANGUAGE, SYSTEM, or PROJECT)
             filename: Name of file being processed
 
         Returns:

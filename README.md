@@ -28,12 +28,13 @@ The repository uses the following structure for organizing rule files:
 
 ```
 clinerules/
+  ├── general/     - General rules that apply to all projects
   ├── system/      - System-specific rule files
   ├── project/     - Project-specific rule files
   └── languages/   - Language-specific rule files
 
 output/
-  └── clinerules   - Generated rules file (without dot prefix)
+  └── .clinerules  - Generated rules file
 ```
 
 ## Available Tools
@@ -42,9 +43,10 @@ The repository includes several Python tools for managing clinerules files:
 
 1. **Create Rules** (`create_rules.py`):
 
-   - Combines selected system, project, and language rules into a single rules file
-   - Interactive selection of components to include
-   - Creates output/clinerules file (without dot prefix)
+   - Combines selected general, system, project, and language rules into a single rules file
+   - Interactive selection of components to include (any section can be skipped)
+   - Creates output/.clinerules file
+   - Requires at least one section to be selected
 
 2. **Compare Rules** (`compare_rules.py`):
 
@@ -66,13 +68,12 @@ The repository includes several Python tools for managing clinerules files:
 2. Run `install.bat` to set up the Python environment and dependencies
 3. Run `run.bat` to access the tools menu
 4. Select the desired operation:
-   - Create a new rules file (outputs to output/clinerules)
+   - Create a new rules file (outputs to output/.clinerules)
    - Compare local and external rules
    - Update local rules from external file
    - Update external file from local rules
 5. For use with Cline VS Code plugin:
-   - Copy output/clinerules to your project
-   - Rename to .clinerules
+   - Copy output/.clinerules to your project
 
 ## Contributing
 

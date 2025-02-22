@@ -29,6 +29,9 @@ class UpdateLocalCLI:
         all_files = []
 
         # Get files from each directory
+        general_files = self.file_manager.list_files(
+            os.path.join(self.clinerules_dir, "general", "clinerules_*")
+        )
         system_files = self.file_manager.list_files(
             os.path.join(self.clinerules_dir, "system", "clinerules_*")
         )
@@ -41,6 +44,12 @@ class UpdateLocalCLI:
 
         # Display files with continuous numbering
         current_number = 1
+
+        if general_files:
+            current_number = self.input_handler.display_files_with_numbers(
+                general_files, "General", current_number
+            )
+            all_files.extend(general_files)
 
         if system_files:
             current_number = self.input_handler.display_files_with_numbers(
@@ -83,6 +92,7 @@ class UpdateLocalCLI:
                 print(f"Error: Clinerules directory not found: {self.clinerules_dir}")
                 print("\nExpected directory structure:")
                 print("clinerules/")
+                print("  ├── general/")
                 print("  ├── system/")
                 print("  ├── project/")
                 print("  └── languages/")

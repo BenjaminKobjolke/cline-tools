@@ -1,4 +1,5 @@
 @echo off
+setlocal enabledelayedexpansion
 echo Cline Tools Runner
 echo.
 echo 1. Create Rules (create_rules.py)
@@ -15,31 +16,37 @@ set /p choice="Enter your choice (1-4): "
 if "%choice%"=="1" (
     python create_rules.py
 ) else if "%choice%"=="2" (
-    set /p external_file="Enter path to external clinerules file: "
-    if "%external_file%"=="" (
-        echo Error: No file path provided
+    set /p "external_file=Enter path to external clinerules file: "
+    if "!external_file!"=="" (
+        echo ERROR: No file path provided
+    ) else if not exist "!external_file!" (
+        echo ERROR: File not found: "!external_file!"
     ) else (
-        echo Using external file: %external_file%
-        python compare_rules.py "%external_file%"
+        echo Using external file: "!external_file!"
+        python compare_rules.py "!external_file!"
     )
 ) else if "%choice%"=="3" (
-    set /p external_file="Enter path to external clinerules file: "
-    if "%external_file%"=="" (
-        echo Error: No file path provided
+    set /p "external_file=Enter path to external clinerules file: "
+    if "!external_file!"=="" (
+        echo ERROR: No file path provided
+    ) else if not exist "!external_file!" (
+        echo ERROR: File not found: "!external_file!"
     ) else (
-        echo Using external file: %external_file%
-        python update_local_cline_rules_with_external_file.py "%external_file%"
+        echo Using external file: "!external_file!"
+        python update_local_cline_rules_with_external_file.py "!external_file!"
     )
 ) else if "%choice%"=="4" (
-    set /p external_file="Enter path to external clinerules file: "
-    if "%external_file%"=="" (
-        echo Error: No file path provided
+    set /p "external_file=Enter path to external clinerules file: "
+    if "!external_file!"=="" (
+        echo ERROR: No file path provided
+    ) else if not exist "!external_file!" (
+        echo ERROR: File not found: "!external_file!"
     ) else (
-        echo Using external file: %external_file%
-        python update_external_cline_rules_with_local_file.py "%external_file%"
+        echo Using external file: "!external_file!"
+        python update_external_cline_rules_with_local_file.py "!external_file!"
     )
 ) else (
-    echo Invalid choice. Please enter a number between 1 and 4.
+    echo ERROR: Invalid choice. Please enter a number between 1 and 4.
 )
 
 REM Deactivate virtual environment

@@ -20,6 +20,10 @@ For example create the directories one by one.
 "del" command does not work in powershell.
 use "Remove-Item"
 
+## How to create multiple folders
+
+Example: mkdir src\core\rules; mkdir src\core\compare
+
 
 # Helper Scripts
 

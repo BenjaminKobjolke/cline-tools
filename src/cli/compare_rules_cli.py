@@ -1,11 +1,12 @@
-import os
+"""CLI interface for comparing clinerules files."""
+
 import argparse
-from typing import Optional, List
+from typing import Optional
 from src.utils.logging_config import setup_logger
-from src.core.file_manager import FileManager
-from src.core.block_extractor import BlockExtractor
-from src.core.diff_handler import DiffHandler
 from src.utils.input_handler import InputHandler
+from src.core.rules.file_selector import FileSelector
+from src.core.compare.block_comparer import BlockComparer
+from src.core.compare.diff_formatter import DiffFormatter
 
 logger = setup_logger(__name__)
 
@@ -15,86 +16,10 @@ class CompareRulesCLI:
 
     def __init__(self):
         """Initialize CompareRulesCLI with required components."""
-        self.file_manager = FileManager()
-        self.block_extractor = BlockExtractor()
-        self.diff_handler = DiffHandler()
+        self.file_selector = FileSelector()
+        self.block_comparer = BlockComparer()
+        self.diff_formatter = DiffFormatter()
         self.input_handler = InputHandler()
-        self.clinerules_dir = os.path.join(os.getcwd(), "clinerules")
-
-    def get_files_by_category(self) -> tuple[List[str], List[str], List[str]]:
-        """
-        Get files organized by category.
-
-        Returns:
-            Tuple of (system_files, project_files, language_files)
-        """
-        system_files = self.file_manager.list_files(
-            os.path.join(self.clinerules_dir, "system", "clinerules_*")
-        )
-        project_files = self.file_manager.list_files(
-            os.path.join(self.clinerules_dir, "project", "clinerules_*")
-        )
-        language_files = self.file_manager.list_files(
-            os.path.join(self.clinerules_dir, "languages", "clinerules_*")
-        )
-        return system_files, project_files, language_files
-
-    def display_and_select_file(
-        self,
-        system_files: List[str],
-        project_files: List[str],
-        language_files: List[str],
-    ) -> Optional[str]:
-        """
-        Display files and get user selection.
-
-        Args:
-            system_files: List of system rule files
-            project_files: List of project rule files
-            language_files: List of language rule files
-
-        Returns:
-            Selected file path or None if no selection made
-        """
-        all_files = []
-        current_number = 1
-
-        # Display system files
-        if system_files:
-            current_number = self.input_handler.display_files_with_numbers(
-                system_files, "System", current_number
-            )
-            all_files.extend(system_files)
-
-        # Display project files
-        if project_files:
-            current_number = self.input_handler.display_files_with_numbers(
-                project_files, "Project", current_number
-            )
-            all_files.extend(project_files)
-
-        # Display language files
-        if language_files:
-            current_number = self.input_handler.display_files_with_numbers(
-                language_files, "Language", current_number
-            )
-            all_files.extend(language_files)
-
-        if not all_files:
-            print("\nNo files found to compare")
-            print(
-                "Make sure the clinerules directory exists with the following structure:"
-            )
-            print("clinerules/")
-            print("  ├── system/")
-            print("  ├── project/")
-            print("  └── languages/")
-            print(f"\nCurrent directory: {os.getcwd()}")
-            return None
-
-        return self.input_handler.get_valid_selection(
-            all_files, "\nSelect file number to compare: "
-        )
 
     def compare_rules_files(self, external_file: str) -> bool:
         """
@@ -107,58 +32,48 @@ class CompareRulesCLI:
             True if comparison was successful, False otherwise
         """
         try:
-            # Check if external file exists
-            if not os.path.exists(external_file):
-                print(f"Error: File not found: {external_file}")
-                return False
+            # Get files by category
+            general_files, system_files, project_files, language_files = self.file_selector.get_files_by_category()
 
-            # Check if clinerules directory exists
-            if not os.path.exists(self.clinerules_dir):
-                print(f"Error: Clinerules directory not found: {self.clinerules_dir}")
-                return False
-
-            # Get and display files by category
-            system_files, project_files, language_files = self.get_files_by_category()
-            local_file = self.display_and_select_file(
-                system_files, project_files, language_files
+            # Display files by category
+            self.file_selector.display_files_by_category(
+                general_files, system_files, project_files, language_files
             )
 
+            # Get user selection
+            all_files = general_files + system_files + project_files + language_files
+            if not all_files:
+                print("\nNo files found to compare")
+                return False
+
+            local_file = self.input_handler.get_valid_selection(
+                all_files, "\nSelect file number to compare: "
+            )
             if not local_file:
                 return False
 
-            # Read file contents
-            external_content = self.file_manager.read_file(external_file)
-            local_content = self.file_manager.read_file(local_file)
-
-            if external_content is None or local_content is None:
+            # Validate files
+            if not self.block_comparer.validate_files(external_file, local_file):
                 return False
 
-            # Determine block type
-            block_type = self.block_extractor.determine_block_type(local_file)
-            if not block_type:
-                print(f"Could not determine block type from path: {local_file}")
+            # Extract blocks for comparison
+            result = self.block_comparer.extract_blocks(external_file, local_file)
+            if result is None:
                 return False
 
-            # Extract blocks
-            external_block = self.block_extractor.extract_block(
-                external_content, block_type, local_file
-            )
-            local_block = self.block_extractor.extract_block(
-                local_content, block_type, local_file
-            )
-
-            if external_block is None or local_block is None:
-                print("Could not extract blocks for comparison")
-                return False
+            external_block, local_block, block_type = result
 
             # Check if blocks are identical
-            if external_block == local_block:
+            if self.block_comparer.are_blocks_identical(external_block, local_block):
                 print("\nBlocks are identical")
                 return True
 
-            # Get diff tool choice and compare
+            # Show block information
+            print(self.diff_formatter.format_block_info(block_type, local_file))
+
+            # Get diff tool choice and show diff
             use_git_diff = self.input_handler.get_diff_tool_choice()
-            return self.diff_handler.compare_with_diff_tool(
+            return self.diff_formatter.show_diff(
                 external_block, local_block, block_type, use_git_diff
             )
 
