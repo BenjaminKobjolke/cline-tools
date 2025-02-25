@@ -88,10 +88,26 @@ class BlockExtractor:
         Returns:
             Extracted block content or None if block cannot be found
         """
-        start_pattern = cls.get_start_pattern(block_type, filename)
-        if not start_pattern:
-            logger.warning(f"Could not determine start pattern for {filename}")
-            return None
+        # For language blocks, search for lines starting with "### BEGIN LANGUAGE"
+        if block_type == "LANGUAGE":
+            # Find all lines starting with "### BEGIN LANGUAGE"
+            begin_lines = re.finditer(r"### BEGIN LANGUAGE.*", content)
+            start_pattern = None
+            
+            # Use the first matching line as the start pattern
+            for line_match in begin_lines:
+                start_pattern = line_match.group(0)
+                break
+                
+            if not start_pattern:
+                logger.warning(f"Could not find '### BEGIN LANGUAGE' in {filename}")
+                return None
+        else:
+            # For non-language blocks, use the existing approach
+            start_pattern = cls.get_start_pattern(block_type, filename)
+            if not start_pattern:
+                logger.warning(f"Could not determine start pattern for {filename}")
+                return None
 
         # Find the start of the block
         start_match = content.find(start_pattern)
@@ -129,9 +145,26 @@ class BlockExtractor:
         Returns:
             Tuple of (start_pos, end_pos) or None if block not found
         """
-        start_pattern = cls.get_start_pattern(block_type, filename)
-        if not start_pattern:
-            return None
+        # For language blocks, search for lines starting with "### BEGIN LANGUAGE"
+        if block_type == "LANGUAGE":
+            # Find all lines starting with "### BEGIN LANGUAGE"
+            begin_lines = re.finditer(r"### BEGIN LANGUAGE.*", content)
+            start_pattern = None
+            
+            # Use the first matching line as the start pattern
+            for line_match in begin_lines:
+                start_pattern = line_match.group(0)
+                break
+                
+            if not start_pattern:
+                logger.warning(f"Could not find '### BEGIN LANGUAGE' in {filename}")
+                return None
+        else:
+            # For non-language blocks, use the existing approach
+            start_pattern = cls.get_start_pattern(block_type, filename)
+            if not start_pattern:
+                logger.warning(f"Could not determine start pattern for {filename}")
+                return None
 
         # Find the start of the block
         start_match = content.find(start_pattern)
