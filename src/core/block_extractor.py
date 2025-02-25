@@ -57,7 +57,14 @@ class BlockExtractor:
         if block_type == "LANGUAGE":
             match = re.search(cls.BLOCK_TYPES["LANGUAGE"], filename)
             if match:
-                language = match.group(1).upper()
+                language_part = match.group(1)
+                
+                # For Arduino C, use special handling
+                if language_part == "arduino_c":
+                    return "### BEGIN LANGUAGE ARDUINO C"
+                
+                # For other languages, use uppercase version
+                language = language_part.upper()
                 return f"### BEGIN LANGUAGE {language}"
             return None
         elif block_type in cls.BLOCK_TYPES:
