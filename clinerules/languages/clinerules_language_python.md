@@ -9,6 +9,7 @@
 - Auto-format code with black
 - Use flake8 for linting
 - Modular Design
+- Never use plain dicts to handle data between function and classes. Create a class for that.
 
 # Virtual Environments
 
