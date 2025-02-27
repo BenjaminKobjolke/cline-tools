@@ -1,6 +1,9 @@
 @echo off
-echo Installing dependencies...
+echo Creating virtual environment...
 
+call python -m venv venv
+
+echo Installing dependencies...
 REM Activate virtual environment
 call %~dp0\venv\Scripts\activate.bat
 
