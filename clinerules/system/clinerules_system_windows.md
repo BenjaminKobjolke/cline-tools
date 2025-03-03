@@ -42,3 +42,5 @@ activate_environment.bat (for python)
 @echo off
 %~dp0\venv\Scripts\activate.bat
 
+Use windows "call" before executing applications in the bat files.
+Like "call python" or "call pip"
