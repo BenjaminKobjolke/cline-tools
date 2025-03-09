@@ -1,5 +1,75 @@
 ### BEGIN LANGUAGE AUTOHOTKEY
 
+# Include File Best Practices
+
+## Avoid Global Code Execution in Include Files
+- Include files should only contain function and label definitions, not executable code
+- Executable code in include files will run when the file is included, potentially blocking execution flow
+- WRONG:
+  ```autohotkey
+  ; This will execute when included and may block the main script
+  MsgBox, This runs on include
+  ```
+- CORRECT:
+  ```autohotkey
+  ; Only define functions and labels
+  MyFunction() {
+      MsgBox, This runs when called
+  }
+  ```
+
+## Avoid Global Label Definitions in Include Files
+- Labels defined at the global scope in include files can cause issues
+- Move labels to the main script instead
+- WRONG (in include file):
+  ```autohotkey
+  MyLabel:
+      DoSomething()
+  return
+  ```
+- CORRECT (move to main script):
+  ```autohotkey
+  ; In main script:
+  MyLabel:
+      DoSomething()
+  return
+  ```
+
+## Avoid SetTimer in Include Files
+- SetTimer calls in include files can cause unexpected behavior
+- Move SetTimer calls to the main script
+- WRONG (in include file):
+  ```autohotkey
+  SetTimer, CheckSomething, 1000
+  ```
+- CORRECT (move to main script):
+  ```autohotkey
+  ; In main script:
+  SetTimer, CheckSomething, 1000
+  ```
+
+## Initialize Global Variables in Functions
+- Don't initialize global variables at the file level in include files
+- Use initialization functions instead
+- WRONG:
+  ```autohotkey
+  global myVar := "value" ; This runs on include
+  ```
+- CORRECT:
+  ```autohotkey
+  InitializeVariables() {
+      global myVar := "value" ; This runs when called
+  }
+  ```
+
+## Use Return at End of Include Files
+- Always end include files with a return statement to prevent fall-through execution
+- CORRECT:
+  ```autohotkey
+  ; At the end of include file
+  return
+  ```
+
 # Object Access
 
 - Use bracket notation for object properties, not dot notation
