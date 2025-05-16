@@ -12,6 +12,7 @@ GENERAL_PATTERN = os.path.join(CLINERULES_DIR, "general", "clinerules*.md")
 SYSTEM_PATTERN = os.path.join(CLINERULES_DIR, "system", "clinerules*.md")
 PROJECT_PATTERN = os.path.join(CLINERULES_DIR, "project", "clinerules*.md")
 LANGUAGE_PATTERN = os.path.join(CLINERULES_DIR, "languages", "clinerules*.md")
+CLINE_PATTERN = os.path.join(CLINERULES_DIR, "cline", "clinerules*.md")
 
 # Output file
 OUTPUT_FILE = os.path.join(OUTPUT_DIR, ".clinerules")
@@ -23,6 +24,7 @@ DIRECTORY_STRUCTURE: Dict[str, List[str]] = {
         "system",
         "project",
         "languages",
+        "cline",
     ]
 }
 
@@ -32,4 +34,5 @@ CATEGORIES = {
     "system": "System-specific rule files",
     "project": "Project-specific rule files",
     "languages": "Language-specific rule files",
+    "cline": "Cline-specific rule files",
 }
